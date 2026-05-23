@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "ap-south-1"
+  region = "us-east-1"
 }
 
 resource "aws_security_group" "app_sg" {
@@ -38,7 +38,7 @@ resource "aws_instance" "server" {
   ami           = "ami-0f58b397bc5c1f2e8"
   instance_type = "t2.micro"
 
-  key_name = "demo"
+  key_name = "devops"
 
   vpc_security_group_ids = [
     aws_security_group.app_sg.id
