@@ -14,7 +14,7 @@
         state: started
         enabled: yes
 
-    - name: Add ubuntu user to docker group
+    - name: Add ubuntu to docker group
       user:
         name: ubuntu
         groups: docker
@@ -22,24 +22,30 @@
 
     - name: Create docker network
       command: docker network create app-network
+      ignore_errors: yes
 
-    - name: Pull Mongo Image
-      command: docker pull mongo
-
-    - name: Pull backend Docker Image
-      command: docker pull sat9999/backend-app:latest
-
-    - name: Run Mongo Image
-      command: docker run -d --name mongo --network app-network mongo
-
-    - name: Remove old mongo  container
-      command: docker rm -f mongo
+    # ---------------- CLEANUP FIRST ----------------
+    - name: Remove old frontend container
+      command: docker rm -f frontend
       ignore_errors: yes
 
     - name: Remove old backend container
       command: docker rm -f backend
       ignore_errors: yes
 
+    - name: Remove old mongo container
+      command: docker rm -f mongo
+      ignore_errors: yes
+
+    # ---------------- RUN MONGO FIRST ----------------
+    - name: Run Mongo container
+      command: >
+        docker run -d
+        --name mongo
+        --network app-network
+        mongo
+
+    # ---------------- BACKEND ----------------
     - name: Run backend container
       command: >
         docker run -d
@@ -50,13 +56,7 @@
         -e MONGO_URI=mongodb://mongo:27017/taskmanager
         sat9999/backend-app:latest
 
-    - name: Pull frontend Docker Image
-      command: docker pull sat9999/frontend-app:latest
-
-    - name: Remove old frontend container
-      command: docker rm -f frontend
-      ignore_errors: yes
-
+    # ---------------- FRONTEND ----------------
     - name: Run frontend container
       command: >
         docker run -d
