@@ -38,3 +38,39 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve
         working-directory: terraform
+      
+      # GET SERVER IP
+      - name: Get Server IP
+        id: tf
+        run: |
+          echo "ip=$(terraform output -raw public_ip)" >> $GITHUB_OUTPUT
+        working-directory: terraform
+
+      # SSH KEY
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      # INSTALL ANSIBLE
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install ansible -y
+
+      # CREATE INVENTORY
+      - name: Create Inventory
+        run: |
+          echo "[web]" > inventory.ini
+          echo "${{ steps.tf.outputs.ip }} ansible_user=ubuntu" >> inventory.ini
+
+      # DISABLE HOST CHECKING
+      - name: Disable Host Checking
+        run: |
+          export ANSIBLE_HOST_KEY_CHECKING=False
+
+      # RUN PLAYBOOK
+      - name: Run Ansible
+        run: |
+          ansible-playbook -i inventory.ini ansible/playbook.yml
