@@ -1,0 +1,53 @@
+- hosts: web
+  become: yes
+
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+
+    - name: Start Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Create docker network
+      command: docker network create app-network
+
+    - name: Pull and Run Mongo Image
+      command: docker run -d --name mongo --network app-network mongo
+
+    - name: Pull backend Docker Image
+      command: docker pull ${{secrets.DOCKER_USERNAME}}/backend-app:latest
+
+    - name: Remove old container
+      command: docker rm -f backend
+      ignore_errors: yes
+
+    - name: Run backend container
+      command: >
+        docker run -d
+        --name backend
+        --network app-network
+        -p 5001:5001
+        -e PORT=5001
+        -e MONGO_URI=mongodb://mongo:27017/taskmanager
+        ${{secrets.DOCKER_USERNAME}}/backend-app:latest
+
+    - name: Pull frontend Docker Image
+      command: docker pull ${{secrets.DOCKER_USERNAME}}/frontend-app:latest
+
+    - name: Remove old container
+      command: docker rm -f frontend
+      ignore_errors: yes
+
+    - name: Run frontend container
+      command: >
+        docker run -d
+        --name frontend
+        --network app-network
+        -p 3000:3000
+        ${{secrets.DOCKER_USERNAME}}/frontend-app:latest
