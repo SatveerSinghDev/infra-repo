@@ -81,4 +81,3 @@ jobs:
           ANSIBLE_HOST_KEY_CHECKING: "False"
         run: |
             ansible-playbook -i inventory.ini ansible/playbook.yml
-      life
