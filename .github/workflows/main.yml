@@ -45,6 +45,11 @@ jobs:
         run: |
           echo "ip=$(terraform output -raw server_ip)" >> $GITHUB_OUTPUT
         working-directory: terraform
+      
+      - name: Wait for EC2 SSH
+        run: |
+          echo "Waiting for server..."
+          sleep 90
 
       # SSH KEY
       - name: Setup SSH
