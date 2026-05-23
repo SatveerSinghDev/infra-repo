@@ -75,12 +75,9 @@ jobs:
           echo "[web]" > inventory.ini
           echo "${{ steps.tf.outputs.ip }} ansible_user=ubuntu" >> inventory.ini
 
-      # DISABLE HOST CHECKING
-      - name: Disable Host Checking
-        run: |
-          export ANSIBLE_HOST_KEY_CHECKING=False
-
       # RUN PLAYBOOK
-      - name: Run Ansible
+      - name: Run Ansible Playbook
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "False"
         run: |
-          ansible-playbook -i inventory.ini ansible/playbook.yml
+            ansible-playbook -i inventory.ini ansible/playbook.yml
