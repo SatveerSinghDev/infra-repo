@@ -36,7 +36,7 @@ jobs:
 
       # TERRAFORM APPLY
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply
         working-directory: terraform
       
       # GET SERVER IP
@@ -81,3 +81,4 @@ jobs:
           ANSIBLE_HOST_KEY_CHECKING: "False"
         run: |
             ansible-playbook -i inventory.ini ansible/playbook.yml
+      life
