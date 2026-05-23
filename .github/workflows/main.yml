@@ -57,10 +57,10 @@ jobs:
             echo "EC2 status checks passed"
 
       # SSH KEY
-      - name: Setup SSH
+      - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" | tr -d '\r' | sed 's/\\n/\n/g' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
       # INSTALL ANSIBLE
