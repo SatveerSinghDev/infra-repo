@@ -14,6 +14,12 @@
         state: started
         enabled: yes
 
+    - name: Add ubuntu user to docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
     - name: Create docker network
       command: docker network create app-network
 
